@@ -52,17 +52,17 @@
   </url>
   
   <url>
-    <loc>https://example.com/Tech-Writing-Project/tags/number-2/</loc>
-    <lastmod>2022-06-25</lastmod>
-  </url>
-  
-  <url>
     <loc>https://example.com/Tech-Writing-Project/tags/second-tag/</loc>
     <lastmod>2022-06-25</lastmod>
   </url>
   
   <url>
     <loc>https://example.com/Tech-Writing-Project/tags/posts-with-two-tags/</loc>
+    <lastmod>2022-06-25</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://example.com/Tech-Writing-Project/tags/number-2/</loc>
     <lastmod>2022-06-25</lastmod>
   </url>
   
