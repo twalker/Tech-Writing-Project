@@ -8,7 +8,7 @@
     <meta name="generator" content="Eleventy v1.0.1">
 
     <link rel="stylesheet" href="/Tech-Writing-Project/css/index.css">
-    <link rel="stylesheet" href="/Tech-Writing-Project/css/prism-base16-monokai.dark.css">
+    <link rel="stylesheet" href="/Tech-Writing-Project/css/prism-base16-atelierlakeside.light.css">
     <link rel="stylesheet" href="/Tech-Writing-Project/css/prism-diff.css">
     <link rel="alternate" href="/Tech-Writing-Project/feed/feed.xml" type="application/atom+xml" title="Free Free API Education">
     <link rel="alternate" href="/Tech-Writing-Project/feed/feed.json" type="application/json" title="Free Free API Education">
@@ -17,14 +17,12 @@
     <header>
       <h1 class="home"><a href="/Tech-Writing-Project/">Free Free API Education</a></h1>
       <ul class="nav">
-        <li class="nav-item"><a href="/Tech-Writing-Project/">Home</a></li>
         <li class="nav-item"><a href="/Tech-Writing-Project/api/api-reference/">Transparency</a></li>
         <li class="nav-item"><a href="/Tech-Writing-Project/browser-fetching/">Fetch</a></li>
         <li class="nav-item"><a href="/Tech-Writing-Project/our-mission/">Our Mission</a></li>
-        <li class="nav-item"><a href="/Tech-Writing-Project/analyte-education-module/">Experiment-Graphing</a></li>
-        <li class="nav-item nav-item-active"><a href="/Tech-Writing-Project/kids/">Kids</a></li>
-        <li class="nav-item"><a href="/Tech-Writing-Project/another-education-module/">Another-Education-Module</a></li>
         <li class="nav-item"><a href="/Tech-Writing-Project/our-methodology/">Our Methodology</a></li>
+        <li class="nav-item"><a href="/Tech-Writing-Project/analytes/">Analytes</a></li>
+        <li class="nav-item nav-item-active"><a href="/Tech-Writing-Project/kids/">Kids</a></li>
       </ul>
     </header>
 
@@ -229,22 +227,32 @@ const play = () => {
 </script>
 <script id="a-duck-strikes-back">
 
+// arrow down key event names
 const UP = "ArrowUp";
 const DOWN = "ArrowDown";
 const LEFT = "ArrowLeft";
 const RIGHT = "ArrowRight";
+const CANVAS_DIMENSIONS = 500
+const STARTING_LOCATION = [250, 250]
+
+// the pond ends 25 pixels from canvas edge
+const SAFE_DUCK_DISTANCE = 25
+// canvas boundaries
+const POND_BOUNDARIES = {north: {y: SAFE_DUCK_DISTANCE}, south: { y: 500 - SAFE_DUCK_DISTANCE}, east: {x: 500 - SAFE_DUCK_DISTANCE}, west: {x: SAFE_DUCK_DISTANCE} } 
+
 
 document.addEventListener("DOMContentLoaded", (event) => {
   const gameState = {
     score: 0,
     playing: false,
-    size: 10,
-    location: [25, 25],
+    size: 20,
+    location: STARTING_LOCATION,
+    flowerLocation: [50, 50],
     velocity: 5,
-    duckImage: new Image(),
-    duckImageContext: document
-      .getElementById("duck-hunt-canvas")
-      .getContext("2d")
+    duckImage: null,
+    flowerImage: null,
+    backgroundImage: null,
+    flowerTimer: null
   };
 
   function setDuckImage() {
@@ -252,29 +260,87 @@ document.addEventListener("DOMContentLoaded", (event) => {
     gameState.duckImage = duckImage;
     gameState.duckImage.src = "../img/duck.png"; // Set source path
     gameState.duckImage.id = "duck-image";
-    gameState.duckImage.tabIndex = "1";
   }
 
+  function setFlowerImage() {
+    const flowerImage = new Image();
+    gameState.flowerImage = flowerImage;
+    gameState.flowerImage.src = "../img/flower.jpeg"; // Set source path
+    gameState.flowerImage.id = "flower-image";
+  }
+
+  function setBackgroundImage() {
+    const backgroundImage = new Image();
+    gameState.backgroundImage = backgroundImage;
+    gameState.backgroundImage.src = "../img/duck-canvas-background.png"; // Set source path
+    gameState.backgroundImage.id = "canvas-background-image";
+  }
+
+  setBackgroundImage()
+  setDuckImage()
+  setFlowerImage()
+
   document.getElementById("play-duck-game").addEventListener("click", playDuckGame);
+  
+
+  function isInsidePond() {
+    // the duck must stay in the pond
+    // returns true if duck is in pond
+
+    // check north pond boundary
+    if (gameState.location[1] - gameState.velocity < POND_BOUNDARIES.north.y) {
+      console.info("WILL HIT NORTH BOUNDARY")  
+      return false
+    }
+    // check south pond boundary
+    if (gameState.location[1] + gameState.velocity > POND_BOUNDARIES.south.y) {
+      console.info("WILL HIT SOUTH BOUNDARY")   
+      return false
+    }
+    // check east pond boundary
+    if (gameState.location[0] + gameState.velocity > POND_BOUNDARIES.east.x) {
+      console.info("WILL HIT EAST BOUNDARY") 
+      return false
+    }
+    // check west pond boundary
+    if (gameState.location[0] - gameState.velocity < POND_BOUNDARIES.west.x) {
+      console.info("WILL HIT WEST BOUNDARY") 
+      return false
+    }
+
+    // handleUpdates();
+
+    return true // duck in pond
+   
+  }
+
+  function handleImageUpdates() {
+    drawDuck();
+    drawFlower();
+  }
 
   function down(keyEvent) {
     // moves duck
-    console.log("key presssed", keyEvent);
-    console.log("location before change", gameState.location);
+
     // only move duck if playing game
     if (!gameState.playing) return;
 
+    // duck cannot leave pond
+    if (!isInsidePond()) {
+      gameState.location = STARTING_LOCATION
+    }
+   
     if (keyEvent.code === UP) {
       // move duck up
       updateLocation([
         gameState.location[0],
-        gameState.location[1] + gameState.velocity
+        gameState.location[1] - gameState.velocity
       ]);
     } else if (keyEvent.code === DOWN) {
       // move duck down
       updateLocation([
         gameState.location[0],
-        gameState.location[1] - gameState.velocity
+        gameState.location[1] + gameState.velocity
       ]);
     } else if (keyEvent.code === LEFT) {
       // move duck left
@@ -289,12 +355,9 @@ document.addEventListener("DOMContentLoaded", (event) => {
         gameState.location[1]
       ]);
     }
-    console.log("location after change", gameState.location);
-    gameState.duckImageContext = document
-      .getElementById("duck-hunt-canvas")
-      .getContext("2d");
-    setDuckImage();
-    drawDuck();
+    
+    handleImageUpdates();
+    duckEatsFlower() 
   }
 
   function updateLocation(newLocation) {
@@ -309,27 +372,29 @@ document.addEventListener("DOMContentLoaded", (event) => {
     gameState.playing = true;
   }
 
-  function playDuckGame() {
-    console.info("playing");
-    resetGameState({
-      score: 0,
-      playing: true,
-      size: 10,
-      location: [25, 25],
-      duckImage: null,
-      duckImageContext: null
-    });
-    gameStart();
+  function getRandomInt(max) {
+  return Math.floor(Math.random() * max);
+}
+
+  function respawnFlower() {
+    const newLocationCoords = SAFE_DUCK_DISTANCE * 2 + getRandomInt(CANVAS_DIMENSIONS / 2)
+    gameState.flowerLocation = [newLocationCoords, newLocationCoords]
+    drawBackgroundImage()
+    handleImageUpdates()  
   }
 
-  function resetGameState(newGameState) {
-    gameState.score = newGameState.score;
-    gameState.duckImage = null;
-    gameState.duckImageContext = null;
-    gameState.playing = false;
-    gameState.size = 10;
-    gameState.location = [25, 25];
-    setDuckImage();
+  function setFlowerTimer() {
+    const FLOWER_DEATH = 5000
+    gameState.timer = setInterval(respawnFlower, FLOWER_DEATH )
+  }
+
+  function playDuckGame() {
+    console.info("playing");
+    gameStart()
+    drawBackgroundImage()
+    handleImageUpdates()
+    setFlowerTimer()
+    console.info("gameState", gameState)
   }
 
   function incrementScore() {
@@ -337,36 +402,98 @@ document.addEventListener("DOMContentLoaded", (event) => {
   }
 
   function drawDuck() {
-    console.log("maybe a duck drawn");
-    if (gameState.duckImageContext) {
-      console.log("------------------\na duck drawn");
-      gameState.duckImageContext.drawImage(
+    const canvas = document.getElementById('duck-hunt-canvas');
+    const context = canvas.getContext('2d');
+    context.drawImage(
         gameState.duckImage,
         gameState.location[0],
         gameState.location[1],
         gameState.size,
         gameState.size
       );
+  }
+
+  const drawFlower = () => {
+    const canvas = document.getElementById('duck-hunt-canvas');
+    const context = canvas.getContext('2d');
+    context.drawImage(
+        gameState.flowerImage,
+        gameState.flowerLocation[0],
+        gameState.flowerLocation[1],
+        gameState.size,
+        gameState.size
+      );
+  }
+
+  const drawBackgroundImage = () => {
+    const canvas = document.getElementById('duck-hunt-canvas');
+    const context = canvas.getContext('2d');
+    context.drawImage(
+        gameState.backgroundImage,
+        0,
+        0,
+        CANVAS_DIMENSIONS,
+        CANVAS_DIMENSIONS
+      );
+  }
+
+  function getDistanceBetween() { 
+    const x = gameState.location[0] - gameState.flowerLocation[0];
+    const y = gameState.location[1] - gameState.flowerLocation[1];
+    
+    return Math.floor(Math.sqrt(x ** 2 + y ** 2));
+  }
+
+  function updateScoreText() {
+    const scoreElement = document.getElementById("score")
+    scoreElement.innerText = gameState.score
+  }
+
+  function duckEatsFlower() {
+    const distance = getDistanceBetween()
+    if (distance <= gameState.size) { // touching flower
+       respawnFlower()
+       handleImageUpdates()
+       incrementScore()
+       updateScoreText()
     }
   }
 
-  function draw() {
+  function begin() {
     console.info("drawing");
-    const scoreElement = document.getElementById("score");
-    document.body.onkeydown = (event) => down(event);
-    drawDuck();
-    scoreElement.innerText = `${gameState.score}`;
+    document.body.onkeydown = (event) => {
+      down(event)
+      // draw images after key change
+    };
   }
-  // draws duck, sets up onkeydown
-  draw();
+  
+  begin();
 });
 
-
-
-
-
 </script>
+
+<div id="games-container">
+
+<div id="a-duck-strikes-back-game-section">
+  <div id="duck-game">
+    <center>
+      <h2>Revenge of the Ducks: A Duck Strikes Back</h2>
+      <div id="duck-game-info">
+          <img id="duck-score-image" alt="a cunning duck" loading="lazy" decoding="async" src="../img/O8-MpS6M80-100.png" width="100" height="100">
+          <img id="flower-for-duck-score-image" alt="a mysterious glowing flower" loading="lazy" decoding="async" src="../img/DTNl14QSdT-25.jpeg" width="25" height="25">
+        <button type="button" id="play-duck-game">Play</button>
+        <br />
+        <p id="score"></p>
+      </div>
+        <canvas tabindex=0 id="duck-hunt-canvas" width="500" height="500"></canvas>
+      </center>
+    </div>
+</div>
+
+    
     <div id="snakes-and-mongooses-game-section">
+        <center>
+         <h2>Snakes and Mongooses</h2> 
         <table id="board">
             <tr class="row">
                 <td class="cell mongoose" id="0" onclick="clickCell('0')"></td>
@@ -386,32 +513,13 @@ document.addEventListener("DOMContentLoaded", (event) => {
         </table>
         <span>
             <button id="play-button" onclick="">
-                Play TTT
+                Play
             </button>
         </span>
         <p id="game-state-message">Press the 'Play' button And Click a square</p>
+      </center>
     </div>
 
-    <div id="a-duck-strikes-back-game-section">
-
-      <div id="duck-game">
-        <center>
-          <h2>Revenge of the Ducks: A Duck Strikes Back</h2>
-        </center>
-          <div id="game-info">
-            <span>
-              <img id="duck-score-image" alt="a cunning duck" loading="lazy" decoding="async" src="../img/O8-MpS6M80-100.png" width="100" height="100">
-              
-              <h4>Score</h4>
-              <h4 id="score"></h4>
-              <h4 id="instructions">Hit 'Play' And Press the left/right/up/down arrow keys to move the duck</h4>
-            </span>
-            <button type="button" id="play-duck-game">Play</button>
-          </div>
-          <center>
-            <canvas id="duck-hunt-canvas" width="500" height="500"></canvas>
-          </center>
-        </div>
     </div>
     </main>
 
