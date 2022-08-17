@@ -264,10 +264,6 @@ a[href].direct-link:focus:visited,
    border: 2px solid green;
 }
 
-#play-button {
-  
-}
-
 /* Duck Game */
 
 canvas {
@@ -295,16 +291,6 @@ canvas {
   display: none;
 }
 
-#play-duck-game {
- 
-}
-
-
-
-
-
-
-
 /* Home */
 
 .blue {
@@ -321,4 +307,28 @@ canvas {
   background-image: url("http://www.geocities.ws/plerrio/goose_x2.png");
   width: 50px;
   height: 50px;
+}
+
+/* Analytes Page */
+
+.analyte-data-col {
+  outline: 1px groove black; 
+  border-style: groove;
+  color: red;
+  text-align: center;
+}
+
+#analyte-header-name {
+  color: blue;
+  font-size: 30px;
+  border: 1px black;
+  border-style: groove;
+}
+
+.table-header-name {
+  font-family:'Times New Roman', Times, serif;
+}
+
+#table-content-key {
+  font-size: small;
 }

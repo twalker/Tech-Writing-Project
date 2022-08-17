@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Analytes</title>
     <meta name="description" content="go back to creative writing school.">
-    <meta name="generator" content="Eleventy v1.0.1">
+    <meta name="generator" content="Eleventy v1.0.2">
 
     <link rel="stylesheet" href="/Tech-Writing-Project/css/index.css">
     <link rel="stylesheet" href="/Tech-Writing-Project/css/prism-base16-atelierlakeside.light.css">
@@ -28,75 +28,111 @@
     <main class="tmpl-experiment-graphing.njk">
       
 <script id="analyte-interaction">
+document.addEventListener("DOMContentLoaded", (event) => {
+  const retrieveAnalyte = () => {
+       console.info("retrieveAnalyte()")  
+       const analyteName = document.getElementById('retrieve-analyte-input').value
+       if (analyteName === '' ) return;
+       const url = `https://stark-ravine-46729.herokuapp.com/api/v1/analytes?name=${analyteName}`
+       console.log(url)
+       fetch(url)
+  // Resolve the JSON returned from the url
+  .then(response => response.json())
+  // Display the image and the raw JSON in the page
+  .then(result => {
+  // Work with the Analyte data
+  console.log(result) 
+  const tableHeaderElement = document.getElementById("analyte-header-name")
+  const tableHeaderName = result.data[0]["analyte"]
+  tableHeaderElement.innerText = tableHeaderName
 
-  const retrieveAnalyte = (analyteIdentifier) => {
-       console.info("retrieveAnalyte()")      
-  }
+   const residentSoil = result.data[0]["resident_soil"]
+   const residentSoilElement = document.getElementById("r1c1")
+   residentSoilElement.innerText = residentSoil
+ 
+   const industrialSoil = result.data[0]["industrial_soil"]
+   const industrialSoilElement = document.getElementById("r1c2")
+   industrialSoilElement.innerText = industrialSoil
+ 
+   const residentAir = result.data[0]["resident_air"]
+   const residentAirElement = document.getElementById("r1c3")
+   residentAirElement.innerText = residentAir
+   
+   const industrialAir = result.data[0]["industrial_air"]
+   const industrialAirElement = document.getElementById("r1c4")
+   industrialAirElement.innerText = industrialAir
+  
+   const tapwater = result.data[0]["tapwater"]
+   const tapwaterElement = document.getElementById("r1c5")
+   tapwaterElement.innerText = tapwater
+   
+   const mcl = result.data[0]["mcl"]
+   const mclElement = document.getElementById("r1c6")
+   mclElement.innerText = mcl
+
+   const riskBasedssl = result.data[0]["risk_based_ssl"]
+   const riskBasedsslElement = document.getElementById("r1c7")
+   riskBasedsslElement.innerText = riskBasedssl
+
+   const mclBasedssl = result.data[0]["mcl_based_ssl"]
+   const mclBasedsslElement = document.getElementById("r1c8")
+   mclBasedsslElement.innerText = mclBasedssl
+  })
+  
+} 
+
+  document.getElementById("retrieve-analyte").addEventListener("click", retrieveAnalyte );
+  
 
   const clearAnalyte = () => {
       console.info("clearAnalyte()")
   }
 
 
-
+})
 </script>
 
 <div id="analyte-tables">
-
-
-   <table class="analyte-table" id="1">
-         
-         <th id="analyte-table-header">First Analyte</th>
-
-         <tr class="analyte-data-row" id="analyte-row1">
-           <td class="analyte-data-col" id="analyte-row1-col1">col1Value</td>
-           <td class="analyte-data-col" id="analyte-row1-col2">col2Value</td>
-         </tr>
-
-          <tr class="analyte-data-row" id="analyte-row2">
-             <td class="analyte-data-col" id="analyte-row2-col1">col1Value</td>
-             <td class="analyte-data-col" id="analyte-row2-col2">col2Value</td>
-          </tr>
-
-          <tr class="analyte-data-row" id="analyte-row3">
-             <td class="analyte-data-col" id="analyte-row3-col1">col1Value</td>
-             <td class="analyte-data-col" id="analyte-row3-col2">col2Value</td>
-          </tr>
-
-          <tr class="analyte-data-row" id="analyte-row4">
-             <td class="analyte-data-col" id="analyte-row4-col1">col1Value</td>
-             <td class="analyte-data-col" id="analyte-row4-col2">col2Value</td>
-          </tr>
-            
-        </table>
-
 
    <table class="analyte-table" id="">
          
          <th id="analyte-table-header"></th>
 
-         <tr class="analyte-data-row" id="analyte-row1">
-           <td class="analyte-data-col" id="analyte-row1-col1"></td>
-           <td class="analyte-data-col" id="analyte-row1-col2"></td>
+<tr>
+  <th id="analyte-header-name"></th>
+  </tr>
+
+  <tr>
+    <th class="table-header-name">Resident Soil (mg/kg)</th>
+    <th class="table-header-name">Industrial Soil (mg/kg)</th>
+    <th class="table-header-name">Resident Air (ug/m3)</th>
+    <th class="table-header-name">Industrial Air (ug/m3)</th>
+    <th class="table-header-name">Tapwater (ug/L)</th>
+    <th class="table-header-name">MCL (ug/L)</th>
+    <th class="table-header-name">Risk-based SSL (mg/kg)</th>
+    <th class="table-header-name">MCL-based SSL (mg/kg)</th>
+  </tr>
+
+         <tr class="analyte-table-row" id="row1">
+           <td class="analyte-data-col" id="r1c1"></td>
+           <td class="analyte-data-col" id="r1c2"></td>
+           <td class="analyte-data-col" id="r1c3"></td>
+           <td class="analyte-data-col" id="r1c4"></td>
+           <td class="analyte-data-col" id="r1c5"></td>
+           <td class="analyte-data-col" id="r1c6"></td>
+           <td class="analyte-data-col" id="r1c7"></td>
+           <td class="analyte-data-col" id="r1c8"></td>
          </tr>
+<tr>
+ <td class="table-key" id="r2c1">
+  <div id="table-content-key">
+ug/l = micrograms per liter
+  </div>
+ </td>
+  </tr>
 
-          <tr class="analyte-data-row" id="analyte-row2">
-             <td class="analyte-data-col" id="analyte-row2-col1"></td>
-             <td class="analyte-data-col" id="analyte-row2-col2"></td>
-          </tr>
 
-          <tr class="analyte-data-row" id="analyte-row3">
-             <td class="analyte-data-col" id="analyte-row3-col1"></td>
-             <td class="analyte-data-col" id="analyte-row3-col2"></td>
-          </tr>
-
-          <tr class="analyte-data-row" id="analyte-row4">
-             <td class="analyte-data-col" id="analyte-row4-col1"></td>
-             <td class="analyte-data-col" id="analyte-row4-col2"></td>
-          </tr>
-            
         </table>
-
 </div>
 
 
@@ -106,7 +142,7 @@
     
     <input type="input" id="retrieve-analyte-input" />
           
-    <button id="retrieve-analyte" onclick="retrieveAnalyte()">Retrieve Analyte</button>
+    <button id="retrieve-analyte">Retrieve Analyte</button>
     <button id="clear-analyte" onclick="clearAnalyteTable()">Clear Analyte</button>
 
     <div id="analyte-search-output"></div>
@@ -116,6 +152,7 @@
 
 </main>
 
+<p>This search tool allows users to extract data from the EPA RSL database.</p>
 <h3 id="testing-injecting-data-and-graphing-that-data." tabindex="-1">Testing injecting data and graphing that data. <a class="direct-link" href="#testing-injecting-data-and-graphing-that-data." aria-hidden="true">#</a></h3>
 
     </main>
